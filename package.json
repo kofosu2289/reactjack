@@ -18,5 +18,9 @@
   "scripts": {
     "start": "webpack-dev-server",
     "build": "NODE_ENV=production webpack -p --config webpack.config.js"
+  },
+  "dependencies": {
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
   }
 }
