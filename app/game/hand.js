@@ -9,7 +9,7 @@
   * @param      {String}   card.suit Card suit
   * @return     {Object}   The score.
   */
- function calculateScore(score, card) {
+ const calculateScore = (score, card) => {
      // ace
      if (card.rank === 'A') {
          score.hardTotal += 1;
@@ -37,7 +37,7 @@
   * @param      {Integer}  score.hardTotal   Hard total
   * @return     {Integer}  The total.
   */
- function calculateTotal(score) {
+ const calculateTotal = (score) => {
      if (score.hardTotal === 21 || score.softTotal === 21) {
          return 21;
      }
