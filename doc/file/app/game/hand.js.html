@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">app/game/hand.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">components</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app/components/app.js~App.html">App</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Card">Card</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Controls">Controls</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Hand">Hand</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Info">Info</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">game</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app/game/deck.js~Deck.html">Deck</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app/game/hand.js~Hand.html">Hand</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-calculateWinPercentage">calculateWinPercentage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dealerDrawing">dealerDrawing</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getWinner">getWinner</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">utils</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-shuffleArray">shuffleArray</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">app/game/hand.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * Calculates the detailed score (soft and hard total).
+ *
+ * @param      {Object}   score   The score
+ * @param      {Integer}  score.softTotal   Soft total
+ * @param      {Integer}  score.hardTotal   Hard total
+ * @param      {Object    card    The card
+  * @param      {String}   card.rank Card rank
+  * @param      {String}   card.suit Card suit
+  * @return     {Object}   The score.
+  */
+ const calculateScore = (score, card) =&gt; {
+     // ace
+     if (card.rank === &apos;A&apos;) {
+         score.hardTotal += 1;
+         score.softTotal += ((score.softTotal + 11) &gt; 21 ) ? 1 : 11;
+     }
+     // face cards
+     else if (typeof card.rank === &apos;string&apos;) {
+        score.hardTotal += 10;
+        score.softTotal += 10;
+     }
+     else {
+        // non-face cards
+        score.hardTotal += card.rank;
+        score.softTotal += card.rank;
+     }
+ 
+     return score;
+ }
+ 
+ /**
+  * Calculates the hand total score.
+  *
+  * @param      {Object}   score   The score
+  * @param      {Integer}  score.softTotal   Soft total
+  * @param      {Integer}  score.hardTotal   Hard total
+  * @return     {Integer}  The total.
+  */
+ const calculateTotal = (score) =&gt; {
+     if (score.hardTotal === 21 || score.softTotal === 21) {
+         return 21;
+     }
+     else if (score.softTotal &gt; 21) {
+         return score.hardTotal;
+     }
+ 
+     return score.softTotal;
+ }
+ 
+ /**
+  * Hand of cards store.
+  * Private variable used by Hand.
+  *
+  * @type       {WeakMap}
+  */
+ let _hand = new WeakMap();
+ /**
+  * Hand stats store.
+  * Private variable used by Hand.
+  *
+  * @type       {WeakMap}
+  */
+ let _stats = new WeakMap();
+ 
+ /**
+  * Create a new Blackjack Hand.
+  * Uses WeakMap variables for privacy
+  *
+  * @class      Deck (name)
+  */
+ export default class Hand {
+     /**
+      * Constructs the object.
+      * Sets initial states for _hand and _stats.
+      */
+     constructor() {
+         this.clear();
+     }
+ 
+     /**
+      * Draws a card to the hand
+      * On each card draw, update score stats
+      *
+      * @param      {Object}  card    The card.
+      * @return     {Object}  Added card to the hand.
+      */
+     draw(card) {
+         // adds a card to the hand
+         let hand = _hand.get(this);
+         hand.push(card);
+         _hand.set(this, hand);
+ 
+         // update stats
+         _stats.set(this, calculateScore(_stats.get(this), card));
+ 
+         return card;
+     }
+ 
+     /**
+      * Sets the vars to the original state.
+      */
+     clear() {
+         _hand.set(this, []);
+         _stats.set(this, {
+             softTotal: 0,
+             hardTotal: 0,
+         });
+     }
+ 
+     /**
+      * Gets the total score.
+      *
+      * @return     {Integer}  The total score.
+      */
+     get scoreTotal() {
+         return calculateTotal(_stats.get(this));
+     }
+ 
+     /**
+      * Gets the statistics.
+      *
+      * @return     {Object}  The score stats.
+      * @return     {Integer} stats.softTotal { Soft total }
+      * @return     {Integer} stats.hardTotal { Hard total }
+      */
+     get scoreStats() {
+         return _stats.get(this);
+     }
+ 
+     /**
+      * Gets the cards.
+      *
+      * @return     {Array}  Array of cards in the current hand
+      */
+     get cards() {
+         return _hand.get(this);
+     }
+ 
+     /**
+      * Determines if the hand is bust.
+      *
+      * @return     {boolean}  True if bust, False otherwise.
+      */
+     get isBust() {
+         return this.scoreTotal &gt; 21;
+     }
+ 
+     /**
+      * Determines if the hand has a blackjack.
+      *
+      * @return     {boolean}  True if has blackjack, False otherwise.
+      */
+     get hasBlackjack() {
+         return this.cards.length === 2 &amp;&amp; this.scoreTotal === 21;
+     }
+ }
+ </code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

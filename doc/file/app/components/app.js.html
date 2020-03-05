@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">app/components/app.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">components</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app/components/app.js~App.html">App</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Card">Card</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Controls">Controls</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Hand">Hand</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Info">Info</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">game</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app/game/deck.js~Deck.html">Deck</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app/game/hand.js~Hand.html">Hand</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-calculateWinPercentage">calculateWinPercentage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dealerDrawing">dealerDrawing</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getWinner">getWinner</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">utils</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-shuffleArray">shuffleArray</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">app/components/app.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import React, { Component, PropTypes } from &apos;react&apos;;
+import Info from &apos;./info&apos;;
+import Hand from &apos;./hand&apos;;
+import Controls from &apos;./controls&apos;;
+import { calculateWinPercentage } from &apos;../game&apos;;
+
+const RESET_ROUND_TIME = 1500;
+
+ /**
+  * Entry point for the view layer of the app
+  *
+  * Renders:
+  * Info component
+  * Hand (dealer) component
+  * Hand (player) component
+  * Control component (buttons)
+  *
+  * @return {ReactElement} markup
+  */
+class App extends Component {
+    /**
+     * Constructor
+     *
+     * @param      {object}    props                Component properties
+     * @param      {object}    props.deck           Deck instance
+     * @param      {object}    props.playerHand     Hand instance
+     * @param      {object}    props.dealerHand     Hand instance
+     * @param      {function}  props.getWinner      Decides the winner
+     * @param      {function}  props.dealerDrawing  Dealer&apos;s AI
+     *
+     */
+    constructor(props) {
+        super(props);
+
+        /**
+         * @type {object}
+         * @property {Integer} winCount
+         * @property {Integer} roundCount
+         * @property {Bool} inProgress
+         * @property {Array} playerHand
+         * @property {Array} dealerHand
+         * @property {Bool|String} winPercentage
+         * @property {Bool} isWin
+         */
+        this.state = {
+            winCount: 0,
+            roundCount: 0,
+            inProgress: false,
+            playerHand: [],
+            dealerHand: [],
+            winPercentage: false,
+            isWin: undefined,
+        };
+    }
+
+
+    /**
+     * Handle deal new cards event (new round).
+     * Deals cards to player and dealer.
+     * Sets application state to update the app view.
+     */
+    onDeal() {
+        let { deck, playerHand, dealerHand } = this.props;
+
+        // clear timeout in case the
+        // deal button is pressed before
+        // the game was reset
+        this.clearTimeout();
+        this.resetRound();
+
+        // deal cards
+        playerHand.draw(deck.deal());
+        dealerHand.draw(deck.deal());
+        playerHand.draw(deck.deal());
+        // second card to dealer
+        // remains in the hand distance
+        // but we want to show it in the view
+        dealerHand.draw(deck.deal());
+
+        // set state to update the view
+        this.setState((prevState, props) =&gt; ({
+            playerHand: playerHand.cards,
+            // first card and the dummy card for
+            // the dealer&apos;s hand view
+            dealerHand: [dealerHand.cards[0], {rank: &apos;dummy&apos;, suit: &apos;&apos;}],
+            playerScore: playerHand.scoreTotal,
+            roundCount: ++prevState.roundCount,
+            inProgress: true,
+        }), () =&gt; {
+            // automatically stand if blackjack is drawn!
+            return playerHand.hasBlackjack ? this.onStand() : null;
+        });
+
+    }
+
+    /**
+     * Handle player&apos;s new hit event.
+     */
+    onHit() {
+        let { deck, playerHand } = this.props;
+
+        // draw one card
+        playerHand.draw(deck.deal());
+
+        // update the view
+        this.setState({
+            playerHand: playerHand.cards,
+            playerScore: playerHand.scoreTotal,
+        }, () =&gt; {
+            // automatically stand if bust
+            return playerHand.isBust ? this.onStand() : null;
+        });
+
+    }
+
+    /**
+     * Handles player&apos;s stand event (round finished).
+     * Dealers hits here - view layer does not know
+     * anything about the logic.
+     * Determines the winner
+     * Updates the view
+     */
+    onStand() {
+        const { playerHand, deck, getWinner, dealerDrawing } = this.props;
+        let { dealerHand } = this.props;
+
+        // let dealer draw
+        dealerDrawing(dealerHand, deck, playerHand);
+
+        // prepare state to be updated
+        const dealerScore = dealerHand.scoreTotal;
+        const isWin = getWinner(playerHand.scoreTotal, dealerScore);
+        const winCount = isWin === true ? ++this.state.winCount : this.state.winCount;
+        const winPercentage = calculateWinPercentage(winCount, this.state.roundCount);
+
+        this.setState((prevState, props) =&gt; ({
+            winCount,
+            winPercentage,
+            dealerHand: dealerHand.cards,
+            dealerScore,
+            inProgress: false,
+            isWin,
+        }), () =&gt; {
+            // hide cards and prepare for the next round
+            this.timeout = window.setTimeout(() =&gt; {
+                this.resetRound();
+            }, RESET_ROUND_TIME);
+        });
+    }
+
+    resetRound() {
+        const { playerHand, dealerHand } = this.props;
+
+        // clear hands
+        playerHand.clear();
+        dealerHand.clear();
+
+        // clean-up the view
+        this.setState({
+            isWin: undefined,
+            playerHand: [],
+            dealerHand: [],
+            playerScore: undefined,
+            dealerScore: undefined,
+        });
+    }
+
+    /**
+     * Clear timeout if defined
+     */
+    clearTimeout() {
+        if (this.timeout) {
+            window.clearTimeout(this.timeout);
+        }
+    }
+
+    /**
+     * Clear timeout when component unmounts.
+     * This is not necessary for this app because
+     * this component will only umnount when the
+     * browser tab/window is closed, but still
+     * it is good to clean-up
+     */
+    componentWillUnmount() {
+        this.clearTimeout();
+    }
+
+
+    /**
+     * Render the app component.
+     * @return {ReactElement} markup
+     */
+    render() {
+        const {
+            roundCount,
+            playerHand,
+            playerScore,
+            dealerScore,
+            dealerHand,
+            inProgress,
+            isWin,
+            winCount,
+            winPercentage,
+        } = this.state;
+
+        return (
+            &lt;div className=&quot;app&quot;&gt;
+                &lt;Info isWin={isWin} winPercentage={winPercentage} /&gt;
+                &lt;Hand cards={dealerHand} score={dealerScore} /&gt;
+                &lt;Hand cards={playerHand} score={playerScore} /&gt;
+                &lt;Controls
+                    dealDisabled={inProgress}
+                    deal={() =&gt; this.onDeal()}
+                    hit={() =&gt; this.onHit()}
+                    stand={() =&gt; this.onStand()}
+                /&gt;
+            &lt;/div&gt;
+        );
+    }
+}
+
+/**
+ * Defines property types for this component.
+ */
+App.propTypes = {
+    deck: PropTypes.object.isRequired,
+    playerHand: PropTypes.object.isRequired,
+    dealerHand: PropTypes.object.isRequired,
+    getWinner: PropTypes.func.isRequired,
+    dealerDrawing: PropTypes.func.isRequired,
+};
+
+export default App;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
