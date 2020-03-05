@@ -61,13 +61,17 @@ class App extends Component {
      */
     onDeal() {
         let { deck, playerHand, dealerHand } = this.props;
-
+      const { roundCount } = this.state;
         // clear timeout in case the
         // deal button is pressed before
         // the game was reset
         this.clearTimeout();
         this.resetRound();
-
+      
+        // shuffle deck every 6 rounds
+        if (roundCount % 6 === 0) {
+          deck.shuffle();  
+        }
         // deal cards
         playerHand.draw(deck.deal());
         dealerHand.draw(deck.deal());
