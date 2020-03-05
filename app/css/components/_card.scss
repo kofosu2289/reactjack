@@ -1,103 +1,140 @@
 .card {
-    color: black;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 5px rgba(lighten(#000, 5%), 0.5);
-    height: 200px;
-    width: 145px;
+  color: #000;
+  height: 200px;
+  width: 146px;
 
-    // hide suit (example S, C,...)
-    // presentation will be replaced by
-    // symbols defined here
-    .suit {
-        font-size: 0;
-    }
+  position: relative;
+  perspective: 600px;
 
-    display: flex;
-    flex-direction: column;
+  // overlap cards
+  margin-left:-70px;
 
-    .section {
+  .front,
+  .back {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(lighten(#000, 5%), 0.5);
+      position: absolute;
+      top:0;
+      left:0;
+      width:inherit;
+      height:inherit;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+  }
 
-        &.top,
-        &.bottom {
-            flex: 0 1 auto;
-            padding-top: 6px;
-
-            span {
-              display: black;
-              font-weight: bold;
-              line-height: 24px;
-              height: 24px;
-
-              &.rank {
-                font-size: 24px;
+  .front {
+      display: flex;
+      flex-direction: column;
+      z-index: 3;
+      transform: rotateX(0) rotateY(0);
+      // hide suit (example S, C,...)
+      // presentation wll be replaced by
+      // symbols defined here
+      .suit {
+          font-size:0;
+      }
+      .section {
+          &.top,
+          &.bottom {
+              flex: 0 1 auto;
+              padding-top: 6px;
+              span {
+                  display: block;
+                  font-weight: bold;
+                  line-height: 24px;
+                  height:24px;
+                  &.rank {
+                      font-size: 24px;
+                  }
+                  &.suit {
+                      padding-left: 1px;
+                      &:after {
+                          font-size: 24px;
+                      }
+                  }
               }
-
-              &.suit {
-                padding-left: 1px;
-
-                &:after {
-                  font-size: 24px;
-                }
-              }
-            }
-        }
-
-        &.center {
-          flex: 1 1 auto;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-
-          &:after {
-            font-size: 80px;
           }
-        }
 
-        &.bottom {
-          transform: rotate(180deg);
-        }
+          &.center {
+              flex: 1 1 auto;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+              &:after {
+                  font-size: 80px;
+              }
+          }
 
-        // align properly rank and suit
-        // at the top and the bottom
-        .container {
-          max-width: 25%;
-          text-align: center;
-        }
-    }
+          &.bottom {
+              transform: rotate(180deg);
+          }
 
-    // color for hearts and diamonds
-    &.H,
-    &.D {
-      color: #e40909;
-    }
+          // align properly rank and suit
+          // at the top and the bottom
+          .container {
+              max-width: 25%;
+              text-align: center;
+          }
+      }
+  }
 
-    //symbols for each suit
-    &.H .suit:after {
-      content: '\2660';
-    }
-    &.S .suit:after {
-      content: '\2660';
-    }
-    &.C .suit:after {
-      content: '\2663';
-    }
-    &.D .suit:after {
-      content: '\2666';
-    }
-    &.face-down {
+  .back {
+      z-index: 2;
+      transform: rotateY(-179deg);
+
       border: 10px solid #fff;
       // pattern from http://lea.verou.me/css3patterns/#argyle
       background-color: #6d695c;
       background-image:
-        repeating-linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
-        repeating-linear-gradient(60deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
-        linear-gradient(60deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)),
-        linear-gradient(120deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1));
-        background-size: 70px 120px;
-        .section {
-            display:none;
-        }
-    }
+      repeating-linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+      repeating-linear-gradient(60deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+      linear-gradient(60deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)),
+      linear-gradient(120deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1));
+      background-size: 70px 120px;
+  }
+
+  // color for hearts and diamonds
+  &.H,
+  &.D {
+      color: #e40909;
+  }
+  // symbols for each suit
+  &.H .suit:after {
+      content: '\2665';
+  }
+  &.S .suit:after {
+      content: '\2660';
+  }
+  &.C .suit:after {
+      content: '\2663';
+  }
+  &.D .suit:after {
+      content: '\2666';
+  }
+  // guarantees some randomness
+  // in card rotation
+  &.H {
+      transform: $card-rotate-hearts;
+  }
+  &.C {
+      transform: $card-rotate-clubs;
+  }
+  &:nth-child(odd) {
+      transform: $card-rotate-odd;
+  }
+  &:nth-child(even) {
+      transform: $card-rotate-even;
+  }
+
+  // facedown card
+  &[data-private="true"] {
+      .front {
+          transform: rotateY(179deg);
+      }
+      .back {
+          transform: rotateX(0) rotateY(0);
+      }
+  }
 }
