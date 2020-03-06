@@ -67,9 +67,6 @@ let config = {
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new DashboardPlugin(),
-        new InterpolateHtmlPlugin({
-          PUBLIC_URL: 'static'
-        }),
     ],
     // source map in ext file in production and cheap fast source maps in dev
     devtool: isProduction ? 'hidden-source-map' : 'eval-source-map',
