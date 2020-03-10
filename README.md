@@ -32,7 +32,7 @@ To run tests, run `yarn test:watch` or `npm test:watch`, `:watch` being an optio
 To see documentation run `yarn docs` or `npm run docs`.
 
 ### Demo
-Will be filled in later
+[http://reactjack.surge.sh](http://reactjack.surge.sh)
 
 ### Sources
 Aside from third-party code listed in `package.json`, this third-party material/tools is used:

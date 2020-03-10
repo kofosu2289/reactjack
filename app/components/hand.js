@@ -14,85 +14,83 @@ import CSSTransitionGroup from 'react-addons-css-transition-group';
  * @return     {ReactElement} markup
  */
 class Hand extends Component {
-    constructor(props) {
-        super(props);
-
-        /**
-         * @type {object}
-         * @property {Bool} isDealing
-         */
-        this.state = {
-            isDealing: false,
-        }
-    }
+  constructor(props) {
+    super(props);
 
     /**
-     * Calculate and change `isDealing` state depending on
-     * the received props.
-     *
-     */
-    componentWillReceiveProps(nextProps) {
-        const nextIsDealing = (nextProps.cards.length <= 2) && nextProps.inProgress;
-        if (this.state.isDealing !== nextIsDealing) {
-            this.setState({
-                isDealing: nextIsDealing,
-            })
-        }
+      * @type {object}
+      * @property {Bool} isDealing
+    */
+    this.state = {
+      isDealing: false,
     }
+  }
 
-    /**
-     * Render conditionally score element.
-     *
-     * @param      {undefined|Integer}  score   The hand's score
-     * @return     {ReactElement}        markup
-     */
-    renderScore(score) {
-        return (
-            score && <span className="score-value">{score}</span>
-        )
+  /**
+    * Calculate and change `isDealing` state depending on
+    * the received props.
+  */
+  componentWillReceiveProps(nextProps) {
+    const nextIsDealing = (nextProps.cards.length <= 2) && nextProps.inProgress;
+    if (this.state.isDealing !== nextIsDealing) {
+      this.setState({
+        isDealing: nextIsDealing,
+      })
     }
+  }
 
-    render() {
-        const { score, cards, owner } = this.props;
-        const { isDealing } = this.state;
+  /**
+    * Render conditionally score element.
+    * @param      {undefined|Integer}  score   The hand's score
+    * @return     {ReactElement}        markup
+  */
+  renderScore(score) {
+    return (
+      score && <span className="score-value">{score}</span>
+    )
+  }
 
-        const dataAttributes = {
-            'data-dealing': isDealing,
-            'data-owner': owner,
-        };
+  render() {
+    const { score, cards, owner } = this.props;
+    const { isDealing } = this.state;
 
-        return (
-            <div className="hand" {...dataAttributes}>
-                <div className="score">
-                    <CSSTransitionGroup transitionName="pop" transitionEnterTimeout={500} transitionLeaveTimeout={100}>
-                        {this.renderScore(score)}
-                    </CSSTransitionGroup>
-                </div>
-                <div className="cards">
-                    <CSSTransitionGroup transitionName="list" transitionEnterTimeout={800} transitionLeaveTimeout={300}>
-                        {cards.map((card, i) =>
-                            <Card
-                                rank={card.rank}
-                                suit={card.suit}
-                                isPrivate={card.rank === 'dummy'}
-                                key={i}
-                            />
-                        )}
-                    </CSSTransitionGroup>
-                </div>
-            </div>
-        );
-    }
+    const dataAttributes = {
+      'data-dealing': isDealing,
+      'data-owner': owner,
+    };
+
+    return (
+      <div className="hand" {...dataAttributes}>
+        <div className="score">
+          <CSSTransitionGroup transitionName="pop" transitionEnterTimeout={500} transitionLeaveTimeout={100}>
+            {this.renderScore(score)}
+          </CSSTransitionGroup>
+        </div>
+        <div className="cards">
+          <CSSTransitionGroup transitionName="list" transitionEnterTimeout={800} transitionLeaveTimeout={300}>
+            {cards.map((card, i) =>
+              <Card
+                rank={card.rank}
+                suit={card.suit}
+                isPrivate={card.rank === 'dummy'}
+                key={i}
+              />
+            )}
+          </CSSTransitionGroup>
+        </div>
+      </div>
+    );
+  }
 }
 
 /**
  * Defines property types for this component.
  */
 Hand.propTypes = {
-    cards: PropTypes.array.isRequired,
-    score: PropTypes.number,
-    inProgress: PropTypes.bool.isRequired,
-    owner: PropTypes.string,
+  cards: PropTypes.array.isRequired,
+  score: PropTypes.number,
+  inProgress: PropTypes.bool.isRequired,
+  owner: PropTypes.string,
 };
 
 export default Hand;

@@ -42,7 +42,7 @@ export default class Deck {
     /**
      * Create the deck of cards and shuffle
      */
-    create() {
+    create(){
         _deck.set(this, shuffleArray(createDeck()));
     }
 

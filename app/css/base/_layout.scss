@@ -15,27 +15,27 @@ body,
   display: flex;
   flex-direction: column;
   header {
-      flex: 0 0 auto;
+    flex: 0 0 auto;
   }
   > section {
-      flex: 1 1 auto;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: row-reverse;
+    .hand {
+      flex: 1 0 50%;
       display: flex;
-      flex-direction: row-reverse;
-      .hand {
-          flex: 1 0 50%;
-          display: flex;
-          flex-direction: column;
-      }
+      flex-direction: column;
+    }
   }
   footer {
-      flex: 0 0 auto;
+    flex: 0 0 auto;
   }
 }
 
 
 @media #{$tablet-down} and (min-height: 580px) {
   .app > section {
-      flex-direction: column;
+    flex-direction: column;
   }
 }
 

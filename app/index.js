@@ -16,17 +16,17 @@ const dealerHand = new Hand();
 const playerHand = new Hand();
 
 /**
- * Renders the app into the DOM.
- * `#root` is the mounting point.
- */
+  * Renders the app into the DOM.
+  * `#root` is the mounting point.
+*/
 ReactDOM.render(
-    // and pass them all to the app component
-    <App
-        deck={deck}
-        dealerHand={dealerHand}
-        playerHand={playerHand}
-        getWinner={getWinner}
-        dealerDrawing={dealerDrawing}
-    />,
-    document.getElementById('root')
+  // and pass them all to the app component
+  <App
+    deck={deck}
+    dealerHand={dealerHand}
+    playerHand={playerHand}
+    getWinner={getWinner}
+    dealerDrawing={dealerDrawing}
+  />,
+  document.getElementById('root')
 );
