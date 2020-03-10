@@ -94,7 +94,7 @@ export default class Hand {
   /**
     * Sets the vars to the original state.
     */
-  clear = () => {
+  clear() {
     _hand.set(this, []);
     _stats.set(this, {
       softTotal: 0,

@@ -25,6 +25,6 @@ describe('<Info />', () => {
     expect(rendered).to.include.text('100%');
 
     rendered = shallow(<Info winPercentage={false} />);
-    expect(rendered).to.not.include.text('wins');
+    expect(rendered).to.not.include.text('Win %');
   });
 });
